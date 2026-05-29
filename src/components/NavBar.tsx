@@ -2,7 +2,7 @@ import { NavLink } from 'react-router-dom';
 
 const links = [
     { to: '/', label: 'Near-Earth Objects', icon: '☄' },
-    { to: '/stars', label: 'Star Catalog', icon: '✦', comingSoon: true},
+    { to: '/stars', label: 'Star Catalog', icon: '✦'},
     { to: '/exoplanets', label: 'Exoplanets', icon: '🪐', comingSoon: true },
 ];
 
