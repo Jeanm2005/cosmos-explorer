@@ -3,7 +3,7 @@ import { NavLink } from 'react-router-dom';
 const links = [
     { to: '/', label: 'Near-Earth Objects', icon: '☄' },
     { to: '/stars', label: 'Star Catalog', icon: '✦'},
-    { to: '/exoplanets', label: 'Exoplanets', icon: '🪐', comingSoon: true },
+    { to: '/exoplanets', label: 'Deep Space', icon: '🌌' },
 ];
 
 export default function NavBar() {
@@ -23,13 +23,7 @@ export default function NavBar() {
                 </span>
             </div>
             <div style={{ display: 'flex', gap: 6 }}>
-                {links.map(({ to, label, icon, comingSoon }) =>
-                    comingSoon ? (
-                        <div key={to} style={{ padding: '6px 14px', fontSize: 12, borderRadius: 6, color: 'rgba(255,255,255,0.25)', display: 'flex', alignItems: 'center', gap: 6 }}>
-                            <span>{icon}</span><span>{label}</span>
-                            <span style={{ fontSize: 9, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'rgba(77,217,255,0.4)', border: '1px solid rgba(77,217,255,0.2)', borderRadius: 3, padding: '1px 5px' }}>soon</span>
-                        </div>
-                    ) : (
+                {links.map(({ to, label, icon }) => (
                         <NavLink key={to} to={to} style={({ isActive }) => ({
                             padding: '6px 14px', fontSize: 12, borderRadius: 6,
                             color: isActive ? '#4dd9ff' : 'rgba(255,255,255,0.6)',
