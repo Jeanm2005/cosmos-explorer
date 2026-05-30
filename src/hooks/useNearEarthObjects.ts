@@ -1,23 +1,43 @@
 import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
-import type { Asteroid, DateRange, NeoWsFeedResponse } from '../types';
+import type { Asteroid, DateRange, NeoWsFeedResponse, NeoWsObjectRaw } from '../types';
 import { normalizeAsteroid } from '../utils/normalizers';
 
-const IS_DEV = import.meta.env.DEV;
 const NASA_DEMO_KEY = 'DEMO_KEY';
 
-function buildUrl(dateRange: DateRange): string {
-    if (IS_DEV) {
-        return `https://api.nasa.gov/neo/rest/v1/feed?start_date=${dateRange.start}&end_date=${dateRange.end}&api_key=${NASA_DEMO_KEY}`;
+function feedUrl(dateRange: DateRange): string {
+    if (import.meta.env.DEV) {
+        const key = import.meta.env.VITE_NASA_API_KEY ?? 'DEMO_KEY';
+        return `https://api.nasa.gov/neo/rest/v1/feed?start_date=${dateRange.start}&end_date=${dateRange.end}&api_key=${key}`;
     }
     return `/api/neo?start=${dateRange.start}&end=${dateRange.end}`;
 }
 
+function detailUrl(id: string): string {
+    if (import.meta.env.DEV) {
+        const key = import.meta.env.VITE_NASA_API_KEY ?? 'DEMO_KEY';
+        return `https://api.nasa.gov/neo/rest/v1/neo/${id}?api_key=${key}`;
+    }
+    return `/api/nep-detail?id=${id}`;
+}
+
 async function fetchNearEarthObjects(dateRange: DateRange): Promise<Asteroid[]> {
-    const url = buildUrl(dateRange);
-    const { data } = await axios.get<NeoWsFeedResponse>(url);
-    const allObjects = Object.values(data.near_earth_objects).flat();
-    return allObjects.map(normalizeAsteroid);
+    // Fetch the feed to get the list
+    const { data } = await axios.get<NeoWsFeedResponse>(feedUrl(dateRange));
+    const rawList: NeoWsObjectRaw[] = Object.values(data.near_earth_objects).flat();
+
+    // Fetch orbital details for each asteroid (cap at 20 to avoid rate limits)
+    const capped = rawList.slice(0, 20);
+    const detailed = await Promise.allSettled(
+        capped.map((raw) =>
+            axios.get<NeoWsObjectRaw>(detailUrl(raw.id)).then((r) => r.data).catch(() => raw)
+        )
+    );
+
+    return detailed.map((result, i) => {
+        const raw = result.status === 'fulfilled' ? result.value : capped[i];
+        return normalizeAsteroid(raw);
+    });
 }
 
 export function useNearEarthObjects(dateRange: DateRange) {

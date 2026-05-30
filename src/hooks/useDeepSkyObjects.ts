@@ -46,10 +46,8 @@ const DSO_IDENTIFIERS = [
 
 async function fetchDSO(identifier: string): Promise<DeepSkyObject | null> {
     try {
-        const url = `https://simbad.cds.unistra.fr/simbad/sim-tap/sync`;
-        const query = `SELECT main_id, otype, ra, dec FROM basic JOIN ident ON oid=ident.oidref WHERE id='${identifier}'`;
-        const { data } = await axios.get(url, {
-            params: { REQUEST: 'doQuery', LANG: 'ADQL', FORMAT: 'json', QUERY: query },
+        const { data } = await axios.get('/api/simbad', {
+            params: { id: identifier },
             timeout: 8000,
         });
 
@@ -79,7 +77,7 @@ async function fetchDSO(identifier: string): Promise<DeepSkyObject | null> {
 async function fetchAllDSOs(): Promise<DeepSkyObject[]> {
     const results = await Promise.allSettled(DSO_IDENTIFIERS.map(fetchDSO));
     return results
-        .filter((r): r is PromiseFulfilledResult<DeepSkyObject> => r.status === 'fulfilled' && r.value !== null)
+        .filter((r): r is PromiseFulfilledResult<DeepSkyObbject> => r.status === 'fulfilled' && r.value !== null)
         .map((r) => r.value);
 }
 
