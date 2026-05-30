@@ -16,14 +16,18 @@ async function fetchNearEarthObjects(dateRange: DateRange): Promise<Asteroid[]> 
     const rawList: NeoWsObjectRaw[] = Object.values(data.near_earth_objects).flat();
 
     // Fetch orbital details using neo_reference_id (JPL id), not id
-    const capped = rawList.slice(0, 20);
+    const capped = rawList.slice(0, 10);
     const detailed = await Promise.allSettled(
-        capped.map((raw) => {
+        capped.map((raw, i) => {
             const jplId = raw.neo_reference_id ?? raw.id;
             const url = import.meta.env.DEV
                 ? `https://api.nasa.gov/neo/rest/v1/neo/${jplId}?api_key=${import.meta.env.VITE_NASA_API_KEY ?? 'DEMO_KEY'}`
                 : `/api/neo-detail?id=${jplId}`;
-            return axios.get<NeoWsObjectRaw>(url).then((r) => r.data).catch(() => raw);
+            return new Promise<NeoWsObjectRaw>((resolve) =>
+                setTimeout(() => {
+                    axios.get<NeoWsObjectRaw>(url).then((r) => resolve(r.data)).catch(() => resolve(raw));
+                }, i * 300)
+            )
         })
     );
 
