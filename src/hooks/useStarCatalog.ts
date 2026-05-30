@@ -18,21 +18,6 @@ export const DEFAULT_STAR_QUERY: StarQueryParams = {
 };
 
 async function fetchStars(params: StarQueryParams): Promise<Star[]> {
-    // VizieR cone search - Hipparcos catalog (HIP), reliable magnitudes + positions
-    const url = 'https://vizier.cds.unistra.fr/viz-bin/conesearch/I/239/hip_main';
-    const response = await axios.get(url, {
-        params: {
-            RA: params.ra,
-            DEC: params.dec,
-            SR: params.radius,
-            VERB: 1,
-            format: 'json',
-        },
-        timeout: 15000,
-    });
-
-    // VizieR returns VOTable XML - parse the CSV fallback instead
-    // Using the TSV endpoint for easier parsing
     const tsvUrl = `https://vizier.cds.unistra.fr/viz-bin/asu-tsv?-source=I/239/hip_main&-c=${params.ra}+${params.dec}&-c.rd=${params.radius}&-out=HIP,RAhms,DEdms,Vmag,B-V&-out.max=${params.limit}`;
     const { data } = await axios.get<string>(tsvUrl, { timeout: 15000 });
     return parseTSV(data);

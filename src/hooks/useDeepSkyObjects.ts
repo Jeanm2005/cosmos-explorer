@@ -77,7 +77,7 @@ async function fetchDSO(identifier: string): Promise<DeepSkyObject | null> {
 async function fetchAllDSOs(): Promise<DeepSkyObject[]> {
     const results = await Promise.allSettled(DSO_IDENTIFIERS.map(fetchDSO));
     return results
-        .filter((r): r is PromiseFulfilledResult<DeepSkyObbject> => r.status === 'fulfilled' && r.value !== null)
+        .filter((r): r is PromiseFulfilledResult<DeepSkyObject> => r.status === 'fulfilled' && r.value !== null)
         .map((r) => r.value);
 }
 

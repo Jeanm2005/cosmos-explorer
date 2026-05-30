@@ -1,4 +1,4 @@
-import type { Exoplanets } from '../hooks/useExoplanets';
+import type { Exoplanet } from '../hooks/useExoplanets';
 
 interface Props {
     exoplanet: Exoplanet;

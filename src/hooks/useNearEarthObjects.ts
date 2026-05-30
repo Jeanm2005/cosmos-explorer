@@ -3,8 +3,6 @@ import axios from 'axios';
 import type { Asteroid, DateRange, NeoWsFeedResponse, NeoWsObjectRaw } from '../types';
 import { normalizeAsteroid } from '../utils/normalizers';
 
-const NASA_DEMO_KEY = 'DEMO_KEY';
-
 function feedUrl(dateRange: DateRange): string {
     if (import.meta.env.DEV) {
         const key = import.meta.env.VITE_NASA_API_KEY ?? 'DEMO_KEY';
