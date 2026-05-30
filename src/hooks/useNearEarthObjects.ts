@@ -11,14 +11,6 @@ function feedUrl(dateRange: DateRange): string {
     return `/api/neo?start=${dateRange.start}&end=${dateRange.end}`;
 }
 
-function detailUrl(id: string): string {
-    if (import.meta.env.DEV) {
-        const key = import.meta.env.VITE_NASA_API_KEY ?? 'DEMO_KEY';
-        return `https://api.nasa.gov/neo/rest/v1/neo/${id}?api_key=${key}`;
-    }
-    return `/api/neo-detail?id=${id}`;
-}
-
 async function fetchNearEarthObjects(dateRange: DateRange): Promise<Asteroid[]> {
     const { data } = await axios.get<NeoWsFeedResponse>(feedUrl(dateRange));
     const rawList: NeoWsObjectRaw[] = Object.values(data.near_earth_objects).flat();
