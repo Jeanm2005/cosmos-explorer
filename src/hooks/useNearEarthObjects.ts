@@ -20,16 +20,19 @@ function detailUrl(id: string): string {
 }
 
 async function fetchNearEarthObjects(dateRange: DateRange): Promise<Asteroid[]> {
-    // Fetch the feed to get the list
     const { data } = await axios.get<NeoWsFeedResponse>(feedUrl(dateRange));
     const rawList: NeoWsObjectRaw[] = Object.values(data.near_earth_objects).flat();
 
-    // Fetch orbital details for each asteroid (cap at 20 to avoid rate limits)
+    // Fetch orbital details using neo_reference_id (JPL id), not id
     const capped = rawList.slice(0, 20);
     const detailed = await Promise.allSettled(
-        capped.map((raw) =>
-            axios.get<NeoWsObjectRaw>(detailUrl(raw.id)).then((r) => r.data).catch(() => raw)
-        )
+        capped.map((raw) => {
+            const jplId = raw.neo_reference_id ?? raw.id;
+            const url = import.meta.env.DEV
+                ? `https://api.nasa.gov/neo/rest/v1/neo/${jplId}?api_key=${import.meta.env.VITE_NASA_API_KEY ?? 'DEMO_KEY'}`
+                : `/api/neo-detail?id=${jplId}`;
+            return axios.get<NeoWsObjectRaw>(url).then((r) => r.data).catch(() => raw);
+        })
     );
 
     return detailed.map((result, i) => {

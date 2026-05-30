@@ -34,6 +34,7 @@ export interface NeoWsCloseApproachRaw {
 
 export interface NeoWsObjectRaw {
     id: string;
+    neo_reference_id?: string;
     name: string;
     designation: string;
     absolute_magnitude_h: number;
