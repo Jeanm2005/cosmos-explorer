@@ -16,7 +16,7 @@ function detailUrl(id: string): string {
         const key = import.meta.env.VITE_NASA_API_KEY ?? 'DEMO_KEY';
         return `https://api.nasa.gov/neo/rest/v1/neo/${id}?api_key=${key}`;
     }
-    return `/api/nep-detail?id=${id}`;
+    return `/api/neo-detail?id=${id}`;
 }
 
 async function fetchNearEarthObjects(dateRange: DateRange): Promise<Asteroid[]> {
