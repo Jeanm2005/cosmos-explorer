@@ -52,7 +52,11 @@ export default function DSOCard({ dso, onClose }: Props) {
                     <span style={{ color: '#e0e8ff', fontSize: 12, fontWeight: 500 }}>{value}</span>
                 </div>
             ))}
-            <NASAImagePanel query={`${dso.name} ${dso.typeLabel} astronomy`} />
+            <NASAImagePanel
+                query={dso.name}
+                fallback={`${dso.typeLabel} Hubble NASA`}
+                objectType={dso.typeLabel.toLowerCase()}
+            />
         </div>
     );
 }

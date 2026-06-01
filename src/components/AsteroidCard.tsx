@@ -55,7 +55,11 @@ export default function AsteroidCard({ asteroid, onClose }: Props) {
                     ))}
                 </div>
             )}
-            <NASAImagePanel query={`${asteroid.name} asteroid NASA`} />
+            <NASAImagePanel 
+                query={asteroid.name}
+                fallback="asteroid NASA close up"
+                objectType="asteroid" 
+            />
         </div>
     );
 }

@@ -108,7 +108,11 @@ export default function StarCatalogPage() {
                     <span style={{ color: '#e0e8ff', fontSize: 12, fontWeight: 500 }}>{value}</span>
                   </div>
                 ))}
-                <NASAImagePanel query={selectedStar.name ? `${selectedStar.name} star` : 'Hipparcos star catalog'} />
+                <NASAImagePanel 
+                  query={selectedStar.name ?? selectedStar.id}
+                  fallback="Hublle star telescope"
+                  objectTye="star" 
+                />
               </div>
             ) : (
               <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: 200, color: 'rgba(255,255,255,0.2)', fontSize: 13, gap: 8 }}>

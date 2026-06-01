@@ -70,7 +70,12 @@ export default function ExoplanetCard({ exoplanet, onClose }: Props) {
             <Row label="Discovery Method" value={exoplanet.discoveryMethod} />
             <Row label="Discovery Year" value={String(exoplanet.discoveryYear)} />
 
-            <NASAImagePanel query={`${exoplanet.name} exoplanet artist concept`} />
+            <NASAImagePanel 
+                query={exoplanet.name}
+                fallback={`${exoplanet.hostStar} star`}
+                objectType="exoplanet"
+                discoveryYear={exoplanet.discoveryYear} 
+            />
         </div>
     );
 }
