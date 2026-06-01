@@ -9,22 +9,30 @@ interface NASAImageResult {
 
 async function fetchNASAImage(query: string): Promise<NASAImageResult | null> {
     const { data } = await axios.get('https://images-api.nasa.gov/search', {
-        params: { q: query, media_type: 'image', page_size: 1},
+        params: { q: query, media_type: 'image', page_size: 5}.
         timeout: 8000,
     });
 
-    const item = data?.collection?.items?.[0];
-    if (!item) return null;
+    const items = data?.collection?.items;
+    if (!items?.length) return null;
 
-    const links = item.links;
-    const meta = item.data?.[0];
-    if (!links?.[0]?.href) return null;
+    // Pick first item that has a usable image link
+    for (const item of items) {
+        const links = item.links;
+        const meta = item.data?.[0];
+        // Prefer ~orig or ~large, fall back to ~small
+        const imageLink = links?.find((l: any) => l.href?.includes('~orig') || l.href?.includes('~large'))
+            ?? links?.find((l: any) => l.href?.includes('.jpg') || l.href?.includes('.png'));
 
-    return {
-        url: links[0].href,
-        title: meta?.title ?? query,
-        description: meta?.description ?? '',
-    };
+        if (imageLink?.href) {
+            return {
+                url: imageLink.href,
+                title: meta?.title ?? query,
+                description: meta?.description ?? '',
+            };
+        }
+    }
+    return null;
 }
 
 export function useNASAImage(query: string, enabled = true) {

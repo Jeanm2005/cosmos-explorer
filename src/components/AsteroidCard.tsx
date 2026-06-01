@@ -55,7 +55,7 @@ export default function AsteroidCard({ asteroid, onClose }: Props) {
                     ))}
                 </div>
             )}
-            <NASAImagePanel query={asteroid.name} />
+            <NASAImagePanel query={`${asteroid.name} asteroid NASA`} />
         </div>
     );
 }
