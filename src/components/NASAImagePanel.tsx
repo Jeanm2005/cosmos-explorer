@@ -1,4 +1,4 @@
-import { useNASAImage } from '../hooks/UseNASAImage';
+import { useNASAImage } from '../hooks/useNASAImage';
 
 interface Props {
     query: string;
@@ -13,7 +13,7 @@ export default function NASAImagePanel({ query, fallback, objectType = 'object',
     if (isLoading) {
         return (
             <div style={{ height: 60, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(255,255,255,0.02)', borderRadius: 8, marginTop: 16 }}>
-                <div style={{ width: 18, height: 18, border: '2px solid rgba(77,217,255,0.2)', borderToprColor: '#4dd9ff', borderRadius: '50%', animation:'sping 0.8s linear infinite' }} />
+                <div style={{ width: 18, height: 18, border: '2px solid rgba(77,217,255,0.2)', borderTopColor: '#4dd9ff', borderRadius: '50%', animation:'sping 0.8s linear infinite' }} />
                 <style>{`@keyframes spin { to { transform: rotate(360deg); } } `}</style>
             </div>
         );
@@ -37,7 +37,7 @@ export default function NASAImagePanel({ query, fallback, objectType = 'object',
     }
 
     return (
-        <div style={{ margintTop: 16, borderRadius: 8, overflow: 'hidden', border: '1px solid rgba(255,255,255,0.07)' }}>
+        <div style={{ marginTop: 16, borderRadius: 8, overflow: 'hidden', border: '1px solid rgba(255,255,255,0.07)' }}>
             <img
                 src={data.url}
                 alt={data.title}

@@ -111,7 +111,7 @@ export default function StarCatalogPage() {
                 <NASAImagePanel 
                   query={selectedStar.name ?? selectedStar.id}
                   fallback="Hublle star telescope"
-                  objectTye="star" 
+                  objectType="star" 
                 />
               </div>
             ) : (
