@@ -9,7 +9,7 @@ interface NASAImageResult {
 
 async function fetchNASAImage(query: string): Promise<NASAImageResult | null> {
     const { data } = await axios.get('https://images-api.nasa.gov/search', {
-        params: { q: query, media_type: 'image', page_size: 5}.
+        params: { q: query, media_type: 'image', page_size: 5},
         timeout: 8000,
     });
 
