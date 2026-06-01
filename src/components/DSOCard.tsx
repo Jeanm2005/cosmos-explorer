@@ -1,4 +1,5 @@
 import type { DeepSkyObject } from '../hooks/useDeepSkyObjects';
+import NASAImagePanel from './NASAImagePanel';
 
 interface Props {
     dso: DeepSkyObject;
@@ -51,6 +52,7 @@ export default function DSOCard({ dso, onClose }: Props) {
                     <span style={{ color: '#e0e8ff', fontSize: 12, fontWeight: 500 }}>{value}</span>
                 </div>
             ))}
+            <NASAImagePanel query={dso.name} />
         </div>
     );
 }

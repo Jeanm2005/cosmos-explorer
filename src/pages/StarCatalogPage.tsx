@@ -3,6 +3,7 @@ import type { Star } from '../types';
 import StarField from '../components/StarField';
 import StarHistogram from '../components/StarHistogram';
 import { useStarCatalog, DEFAULT_STAR_QUERY, type StarQueryParams } from '../hooks/useStarCatalog';
+import NASAImagePanel from '../components/NASAImagePanel';
 
 const PRESETS = [
   { label: 'Orion Nebula', ra: 83.8221, dec: -5.3911 },
@@ -107,6 +108,7 @@ export default function StarCatalogPage() {
                     <span style={{ color: '#e0e8ff', fontSize: 12, fontWeight: 500 }}>{value}</span>
                   </div>
                 ))}
+                <NASAImagePanel query={selectedStar.name ?? selectedStar.id} />
               </div>
             ) : (
               <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: 200, color: 'rgba(255,255,255,0.2)', fontSize: 13, gap: 8 }}>

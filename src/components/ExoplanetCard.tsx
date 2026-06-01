@@ -1,4 +1,5 @@
 import type { Exoplanet } from '../hooks/useExoplanets';
+import NASAImagePanel from './NASAImagePanel';
 
 interface Props {
     exoplanet: Exoplanet;
@@ -68,6 +69,8 @@ export default function ExoplanetCard({ exoplanet, onClose }: Props) {
             <Row label="Distance" value={exoplanet.distanceFromEarth ? `${exoplanet.distanceFromEarth.toFixed(1)} pc` : '—'} />
             <Row label="Discovery Method" value={exoplanet.discoveryMethod} />
             <Row label="Discovery Year" value={String(exoplanet.discoveryYear)} />
+
+            <NASAImagePanel query={`${exoplanet.name} exoplanet`} />
         </div>
     );
 }

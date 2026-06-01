@@ -1,5 +1,6 @@
 import type { Asteroid } from '../types';
 import { formatDiameter, formatDistance } from '../utils/normalizers';
+import NASAImagePanel from './NASAImagePanel';
 
 interface Props {
     asteroid: Asteroid;
@@ -54,6 +55,7 @@ export default function AsteroidCard({ asteroid, onClose }: Props) {
                     ))}
                 </div>
             )}
+            <NASAImagePanel query={asteroid.name} />
         </div>
     );
 }
