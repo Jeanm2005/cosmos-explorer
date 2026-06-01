@@ -35,7 +35,7 @@ async function fetchNASAImage(query: string): Promise<NASAImageResult | null> {
     return null;
 }
 
-export function useNASAImage(query: string, enabled = true) {
+export function useNASAImage(query: string, fallbackQuery?: string, enabled = true) {
     return useQuery({
         queryKey: ['nasa-image', query],
         queryFn: () => fetchNASAImage(query),
