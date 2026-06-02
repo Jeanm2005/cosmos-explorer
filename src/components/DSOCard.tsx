@@ -6,6 +6,40 @@ interface Props {
     onClose: () => void;
 }
 
+const DSO_SEARCH_NAMES: Record<string, string> = {
+    'M1': 'Crab Nebula',
+    'M8': 'Lagoon Nebula',
+    'M13': 'Hercules globular cluster',
+    'M16': 'Eagle Nebula',
+    'M17': 'Omega Nebula',
+    'M20': 'Trifid Nebula',
+    'M27': 'Dumbbell Nebula',
+    'M31': 'Andromeda Galaxy',
+    'M32': 'Andromeda companion galaxy',
+    'M33': 'Triangulum Galaxy',
+    'M42': 'Orion Nebula',
+    'M43': 'Orion Nebula',
+    'M51': 'Whirlpool Galaxy',
+    'M57': 'Ring Nebula',
+    'M63': 'Sunflower Galaxy',
+    'M64': 'Black Eye Galaxy',
+    'M74': 'Phantom Galaxy',
+    'M77': 'Cetus galaxy',
+    'M81': "Bode's Galaxy",
+    'M82': 'Cigar Galaxy',
+    'M87': 'M87 black hole galaxy',
+    'M97': 'Owl Nebula',
+    'M101': 'Pinwheel Galaxy',
+    'M104': 'Sombrero Galaxy',
+    'NGC 1052': 'NGC 1052 galaxy',
+    'NGC 1275': 'Perseus A galaxy',
+    'NGC 4889': 'Coma cluster galaxy',
+    'Crab Pulsar': 'Crab Nebula',
+    '3C 273': 'quasar 3C 273',
+    'Sgr A*': 'Sagittarius A black hole',
+    'Cygnus X-1': 'Cygnus X-1 black hole',
+};
+
 const TYPE_COLORS: Record<string, string> = {
     galaxy: '#ce93d8',
     nebula: '#4dd9ff',
@@ -53,7 +87,7 @@ export default function DSOCard({ dso, onClose }: Props) {
                 </div>
             ))}
             <NASAImagePanel
-                query={dso.name}
+                query={DSO_SEARCH_NAMES[dso.name] ?? dso.name}
                 fallback={`${dso.typeLabel} Hubble NASA`}
                 objectType={dso.typeLabel.toLowerCase()}
             />
