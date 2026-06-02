@@ -87,7 +87,7 @@ export default function DSOCard({ dso, onClose }: Props) {
                 </div>
             ))}
             <NASAImagePanel
-                query={DSO_SEARCH_NAMES[dso.name] ?? dso.name}
+                query={DSO_SEARCH_NAMES[dso.id] ?? dso.name}
                 fallback={`${dso.typeLabel} Hubble NASA`}
                 objectType={dso.typeLabel.toLowerCase()}
             />
