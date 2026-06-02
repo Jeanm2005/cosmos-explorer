@@ -7,41 +7,51 @@ interface NASAImageResult {
     description: string;
 }
 
-async function fetchNASAImage(query: string): Promise<NASAImageResult | null> {
+async function searchNASA(query: string): Promise<NASAImageResult | null> {
     const { data } = await axios.get('https://images-api.nasa.gov/search', {
         params: { q: query, media_type: 'image', page_size: 5},
         timeout: 8000,
     });
 
-    const items = data?.collection?.items;
+    const items = data?.collections?.items;
     if (!items?.length) return null;
 
-    // Pick first item that has a usable image link
     for (const item of items) {
-        const links = item.links;
+        const links = item.links as Array<{ href: string }>;
         const meta = item.data?.[0];
-        // Prefer ~orig or ~large, fall back to ~small
-        const imageLink = links?.find((l: any) => l.href?.includes('~orig') || l.href?.includes('~large'))
-            ?? links?.find((l: any) => l.href?.includes('.jpg') || l.href?.includes('.png'));
+        if (!links?.length) continue;
 
-        if (imageLink?.href) {
+        const best = 
+            links.find(l => l.href?.includes('~large.jpg')) ??
+            links.find(l => l.href?.includes('~medium.jpg')) ??
+            links.find(l => l.href?.includes('~small.jpg')) ??
+            links.find(l => l.href?.endsWith('.jpg') || l.href?.endsWith('.png'));
+
+        if (best?.href) {
             return {
-                url: imageLink.href,
+                url: best.href,
                 title: meta?.title ?? query,
-                description: meta?.description ?? '',
+                description: meta?.description?.slice(0, 200) ?? '',
             };
         }
     }
     return null;
 }
 
-export function useNASAImage(query: string, fallbackQuery?: string, enabled = true) {
+async function fetchNASAImage(primaryQuery: string, fallbackQuery?: string): Promise<NASAImageResult | null> {
+    const result = await searchNASA(primaryQuery);
+    if (result) return result;
+    if (fallbackQuery) return searchNASA(fallbackQuery);
+    return null;
+}
+
+export function useNASAImage(primaryQuery: string, fallbackQuery?: string, enabled = true) {
     return useQuery({
-        queryKey: ['nasa-image', query],
-        queryFn: () => fetchNASAImage(query),
+        queryKey: ['nasa-image', primaryQuery, fallbackQuery],
+        queryFn: () => fetchNASAImage(primaryQuery, fallbackQuery),
         staleTime: 1000 * 60 * 60 * 24,
         gcTime: 1000 * 60 * 60 * 24,
         retry: 1,
-        enabled: enabled && Boolean(query),
+        enabled: enabled && Boolean(primaryQuery),
     });
 }
