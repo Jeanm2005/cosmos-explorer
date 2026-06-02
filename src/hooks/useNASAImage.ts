@@ -13,7 +13,7 @@ async function searchNASA(query: string): Promise<NASAImageResult | null> {
         timeout: 8000,
     });
 
-    const items = data?.collections?.items;
+    const items = data?.collection?.items;
     if (!items?.length) return null;
 
     for (const item of items) {
