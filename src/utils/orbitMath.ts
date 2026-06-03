@@ -110,3 +110,27 @@ export function auToPixels(
         py: svgSize / 2 - au.y * scale, // flip y: SVG y grows downward
     };
 }
+
+// J2000 epoch in milliseconds (2000-01-01 12:00 UTC)
+const J2000_MS = Date.UTC(2000, 0, 1, 12, 0, 0);
+
+/** Advance mean anomaly to a given date based on orbital period. */
+export function meanAnomalyAtDate(epochMeanAnomaly: number, periodDays: number, date: Date): number {
+    const daysSinceEpoch = (date.getTime() - J2000_MS) / 86400000;
+    const advanced = epochMeanAnomaly + (360 / periodDays) * daysSinceEpoch;
+    return ((advanced % 360) + 360) % 360;
+}
+
+/** Position (in AU) of a body at a given date, accounting for orbital motion. */
+export function bodyPositionAtDate(
+    elements: OrbitalElements,
+    periodDays: number,
+    date: Date
+): { x: number; y: number} {
+    const M = meanAnomalyAtDate(elements.meanAnomaly, periodDays, date);
+    return orbitalElementsToXY({ ...elements, meanAnomaly: M });
+}
+
+export function periodFromSemiMajorAxis(semiMajorAxisAU: number): number {
+    return Math.pow(semiMajorAxisAU, 1.5) * 365.25;
+}

@@ -20,7 +20,7 @@ export function normalizeAsteroid(raw: NeoWsObjectRaw): Asteroid {
             argumentOfPerihelion: parseFloat(od.perihelion_argument),
             meanAnomaly: parseFloat(od.mean_anomaly),
             }
-        : DEFAULT_ORBITAL;
+        : fallbackOrbit(raw);
 
     return {
         id: raw.id,
@@ -49,4 +49,27 @@ export function formatDiameter(min: number, max: number): string {
 export function formatDistance(au: number): string {
     if (au < 0.01) return `${(au * 149597871).toFixed(0)} km`;
     return `${au.toFixed(4)} AU`;
+}
+
+// Deterministic pseudo-random from a string
+function hashToUnit(str: string): number {
+    let h = 0;
+    for (let i = 0; i < str.length; i++) h = (h * 31 + str.charCodeAt(i)) | 0;
+    return (Math.abs(h) % 10000) / 10000; // 0..1
+}
+
+function fallbackOrbit(raw: NeoWsObjectRaw): OrbitalElements {
+    const seed = hashToUnit(raw.id);
+    const seed2 = hashToUnit(raw.id + 'x');
+    // Near-Earth asteroids mostly sit 0.8-2.5 AU with modest eccentricity
+    const ca = raw.close_approach_data?.[0];
+    const approachAU = ca ? parseFloat(ca.miss_distance.astronomical) : 0;
+    return {
+        semiMajorAxis: 0.9 + seed * 1.6,
+        eccentricity: 0.05 + seed2 * 0.35,
+        inclination: seed * 25,
+        longitudeAscendingNode: seed * 360,
+        argumentOfPerihelion: seed2 * 360,
+        meanAnomaly: (seed + seed2 + approachAU) * 360 % 360, // scatter starting position
+    };
 }
