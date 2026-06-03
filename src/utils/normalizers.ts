@@ -1,14 +1,5 @@
 import type { Asteroid, NeoWsObjectRaw, OrbitalElements } from '../types';
 
-const DEFAULT_ORBITAL: OrbitalElements = {
-    semiMajorAxis: 1.5,
-    eccentricity: 0.2,
-    inclination: 5,
-    longitudeAscendingNode: 0,
-    argumentOfPerihelion: 0,
-    meanAnomaly: 0,
-};
-
 export function normalizeAsteroid(raw: NeoWsObjectRaw): Asteroid {
     const od = raw.orbital_data;
     const orbitalElements: OrbitalElements = od
