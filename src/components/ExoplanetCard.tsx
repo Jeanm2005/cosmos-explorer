@@ -1,5 +1,10 @@
 import type { Exoplanet } from '../hooks/useExoplanets';
 import NASAImagePanel from './NASAImagePanel';
+import HostLikelihoodPanel from './HostLikelihoodPanel';
+import { findHostParams } from '../utils/curatedStars';
+import { curatedStarList } from '../utils/curatedStars';
+
+const curatedCount = curatedStarList.length;
 
 interface Props {
     exoplanet: Exoplanet;
@@ -76,6 +81,17 @@ export default function ExoplanetCard({ exoplanet, onClose }: Props) {
                 objectType="exoplanet"
                 discoveryYear={exoplanet.discoveryYear} 
             />
+            {(() => {
+                const hostParams = findHostParams(exoplanet.hostStar);
+                return hostParams ? (
+                    <HostLikelihoodPanel params={hostParams} starName={exoplanet.hostStar} />
+                ) : (
+                    <div style={{ marginTop: 16, padding: '12px 14px', background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: 8, fontSize: 11, color: 'rgba(255,255,255,0.35)', lineHeight: 1.5 }}>
+                        <span style={{ color: 'rgba(77,217,255,0.6)', marginRight: 6}}>◷</span>
+                        Uniform Gaia stellar parameters not available for {exoplanet.hostStar}, so the ML host-likelihood model can't score it. The model covers {curatedCount} confirmed hosts with complete Gaia DR3 parameters.
+                    </div>
+                );
+            })()}
         </div>
     );
 }
