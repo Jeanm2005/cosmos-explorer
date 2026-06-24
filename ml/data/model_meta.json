@@ -1,0 +1,10 @@
+{
+  "features": [
+    "teff",
+    "radius",
+    "mass",
+    "metallicity",
+    "luminosity"
+  ],
+  "test_auc": 0.7026857073309263
+}
