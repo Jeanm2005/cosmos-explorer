@@ -37,11 +37,13 @@ base.load_model(os.path.join(DATA, "host_model_base.json"))
 importances = dict(zip(FEATURES, [float(x) for x in base.feature_importances_]))
 
 class StarParams(BaseModel):
-    teff: float = Field(..., description="Effective temperature [K]")
-    radius: float = Field(..., description="Stellar radius [solar radii]")
-    mass: float = Field(..., description="Stellar mass [solar masses]")
-    metallicity: float = Field(..., description="Metallicity [M/H], dex")
-    luminosity: float = Field(..., description="Luminosity [solar units]")
+    teff: float = Field(..., gt=1000, lt=60000, description="Effective temperature [K]")
+    radius: float = Field(..., gt=0, lt=2000, description="Stellar radius [solar radii]")
+    mass: float = Field(..., gt=0, lt=500, description="Stellar mass [solar masses]")
+    metallicity: float = Field(..., gt=-5, lt=2, description="Metallicity [M/H], dex")
+    luminosity: float = Field(..., gt=0, lt=1_000_000, description="Luminosity [solar units]")
+
+    model_config = {"extra": "forbid"}  # reject unexpected fields
     
 @app.get("/health")
 def health():

@@ -29,3 +29,6 @@ ml/data/*
 !ml/data/host_model_base.json
 !ml/data/host_model_calibrated.joblib
 !ml/data/model_meta.json
+
+__pycache__/
+*.pyc

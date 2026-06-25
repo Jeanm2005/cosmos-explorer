@@ -3,9 +3,23 @@ import axios from 'axios';
 
 const NASA_BASE = 'https://api.nasa.gov/neo/rest/v1/feed';
 
-export default async function handler(req: VercelRequest, res: VercelResponse) {
-    res.setHeader('Access-Control-Allow-Origin', '*');
+const ALLOWED_ORIGINS = [
+    'https://cosmos-explorer-kappa.vercel.app',
+    'http://localhost:5173',
+    'http://localhost:3000',
+];
+
+function setCors(req: VercelRequest, res: VercelResponse) {
+    const origin = req.headers.origin;
+    if (origin && ALLOWED_ORIGINS.includes(origin)) {
+        res.setHeader('Access-Control-Allow-Origin', origin);
+    }
     res.setHeader('Access-Control-Allow-Methods', 'GET');
+    res.setHeader('Vary', 'Origin');
+}
+
+export default async function handler(req: VercelRequest, res: VercelResponse) {
+    setCors(req, res);
 
     if (req.method !== 'GET') {
         return res.status(405).json({ error: 'Method not allowed' });
@@ -28,9 +42,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         return res.status(200).json(upstream.data);
     } catch (err) {
         if (axios.isAxiosError(err)) {
-            const status = err.response?.status ?? 500;
-            const message = err.response?.data?.error_message ?? err.message;
-            return res.status(status).json({ error: message });
+            const status = err.response?.status ?? 502;
+            return res.status(status).json({ error: 'Upstream request failed' });
         }
         return res.status(500).json({ error: 'Unexpected proxy error' });
     }
