@@ -9,14 +9,22 @@ import numpy as np
 import joblib
 import xgboost as xgb
 from fastapi import FastAPI
+from fastapi import Request
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
+from slowapi import Limiter, _rate_limit_exceeded_handler
+from slowapi.util import get_remote_address
+from slowapi.errors import RateLimitExceeded
 
 
 FEATURES = ["teff", "radius", "mass", "metallicity", "luminosity"]
 DATA = os.path.join(os.path.dirname(__file__), "..", "data")
 
 app = FastAPI(title="Stellar Host Likelihood API", version="1.0")
+
+limiter = Limiter(key_func=get_remote_address)
+app.state.limiter = limiter
+app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
 # CORS: lock to your deployed frontend in production; localhost for dev.
 app.add_middleware(
@@ -36,6 +44,7 @@ base = xgb.XGBClassifier()
 base.load_model(os.path.join(DATA, "host_model_base.json"))
 importances = dict(zip(FEATURES, [float(x) for x in base.feature_importances_]))
 
+
 class StarParams(BaseModel):
     teff: float = Field(..., gt=1000, lt=60000, description="Effective temperature [K]")
     radius: float = Field(..., gt=0, lt=2000, description="Stellar radius [solar radii]")
@@ -50,7 +59,8 @@ def health():
     return {"status": "ok"}
 
 @app.post("/predict")
-def predict(p: StarParams):
+@limiter.limit("10/minute")
+def predict(request: Request, p: StarParams):
     x = np.array([[p.teff, p.radius, p.mass, p.metallicity, p.luminosity]])
     prob = float(calibrated.predict_proba(x)[0, 1])
     return {
