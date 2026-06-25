@@ -18,7 +18,7 @@ export const DEFAULT_STAR_QUERY: StarQueryParams = {
 };
 
 async function fetchStars(params: StarQueryParams): Promise<Star[]> {
-    const tsvUrl = `https://vizier.cds.unistra.fr/viz-bin/asu-tsv?-source=I/239/hip_main&-c=${params.ra}+${params.dec}&-c.rd=${params.radius}&-out=HIP,RAhms,DEdms,Vmag,B-V&-out.max=${params.limit}`;
+    const tsvUrl = `https://vizier.cds.unistra.fr/viz-bin/asu-tsv?-source=I/239/hip_main&-c=${params.ra}+${params.dec}&-c.rd=${params.radius}&-out=HIP,RAhms,DEdms,Vmag,B-V,Plx&-out.max=${params.limit}`;
     const { data } = await axios.get<string>(tsvUrl, { timeout: 15000 });
     return parseTSV(data);
 }
@@ -37,6 +37,7 @@ function parseTSV(raw: string): Star[] {
     const decIdx = headers.findIndex((h) => h.includes('DE') || h.includes('DEdms'));
     const magIdx = headers.findIndex((h) => h.includes('Vmag'));
     const bvIdx = headers.findIndex((h) => h.includes('B-V'));
+    const plxIdx = headers.findIndex((h) => h.includes('Plx'));
 
     for (const line of lines.slice(headerIdx + 1)) {
         const cols = line.split('\t').map((c) => c.trim());
@@ -53,12 +54,18 @@ function parseTSV(raw: string): Star[] {
 
         if (isNaN(ra) || isNaN(dec)) continue;
 
+        // Parallax (mas) → distance (parsecs): d = 1000 / Plx.
+        // Guard against zero/negative parallax (measurement noise on distant stars).
+        const plxRaw = plxIdx >= 0 ? parseFloat(cols[plxIdx]) : NaN;
+        const distance = !isNaN(plxRaw) && plxRaw > 0 ? 1000 / plxRaw : undefined;
+
         stars.push({
             id: `HIP${cols[hipIdx] ?? stars.length}`,
             ra,
             dec,
             magnitude: mag,
             colorIndex: parseFloat(cols[bvIdx]) || undefined,
+            distance,
         });
     }
     return stars;

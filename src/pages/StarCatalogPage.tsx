@@ -4,6 +4,7 @@ import StarField from '../components/StarField';
 import StarHistogram from '../components/StarHistogram';
 import { useStarCatalog, DEFAULT_STAR_QUERY, type StarQueryParams } from '../hooks/useStarCatalog';
 import NASAImagePanel from '../components/NASAImagePanel';
+import StellarPhysicsPanel from '../components/StellarPhysicsPanel';
 
 const PRESETS = [
   { label: 'Orion Nebula', ra: 83.8221, dec: -5.3911 },
@@ -112,6 +113,12 @@ export default function StarCatalogPage() {
                   query={selectedStar.name ?? selectedStar.id}
                   fallback="Hublle star telescope"
                   objectType="star" 
+                />
+                <StellarPhysicsPanel
+                  colorIndex={selectedStar.colorIndex}
+                  magnitude={selectedStar.magnitude}
+                  distance={selectedStar.distance}
+                  starName={selectedStar.name ?? selectedStar.id}
                 />
               </div>
             ) : (
