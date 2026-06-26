@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Privacy Policy · Cosmos Explorer</title>
+  <style>
+    body {
+      background: #050814;
+      color: #e0e8ff;
+      font-family: system-ui, -apple-system, sans-serif;
+      line-height: 1.6;
+      max-width: 760px;
+      margin: 0 auto;
+      padding: 48px 24px 80px;
+    }
+    h1 { font-size: 28px; margin-bottom: 4px; }
+    h2 { font-size: 18px; margin-top: 32px; color: #4dd9ff; }
+    p, li { color: rgba(255,255,255,0.75); font-size: 15px; }
+    a { color: #4dd9ff; }
+    .updated { color: rgba(255,255,255,0.4); font-size: 13px; margin-bottom: 32px; }
+    code { background: rgba(255,255,255,0.06); padding: 1px 5px; border-radius: 4px; font-size: 13px; }
+  </style>
+</head>
+<body>
+  <h1>Privacy Policy</h1>
+  <p class="updated">Cosmos Explorer · Last updated June 2026</p>
+
+  <p>
+    Cosmos Explorer is a personal, non-commercial project for exploring public
+    astronomical data. This policy explains what limited data the application
+    processes and why. It is written to reflect what the application actually
+    does, and nothing more.
+  </p>
+
+  <h2>What this application does not do</h2>
+  <ul>
+    <li>It does not require you to create an account or provide any personal information.</li>
+    <li>It does not use advertising or analytics tracking cookies.</li>
+    <li>It does not sell, share, or monetize any data.</li>
+    <li>It does not build user profiles or track you across other websites.</li>
+  </ul>
+
+  <h2>What is processed, and why</h2>
+  <p>
+    <strong>IP addresses (for security).</strong> To protect the service from
+    abuse, the application applies rate limiting to its API endpoints. This
+    requires temporarily processing the IP address of incoming requests to count
+    how many requests each source makes within a short time window. Rate-limit
+    counts for the API proxies are stored transiently in a hosted Redis instance
+    (Upstash) and expire automatically; the machine-learning prediction service
+    counts requests in memory only. IP addresses are used solely for this
+    security purpose and are not used to identify you.
+  </p>
+  <p>
+    <strong>Standard request data.</strong> Like any website, the hosting
+    providers (Vercel and Render) automatically log standard technical request
+    information (such as IP address, timestamp, and request path) for operational
+    and security purposes. This is handled by those providers under their own
+    privacy policies.
+  </p>
+
+  <h2>Third-party services</h2>
+  <p>
+    The application retrieves astronomical data from public third-party APIs.
+    When you use a feature, your browser or the application's servers may contact:
+  </p>
+  <ul>
+    <li>NASA (asteroid, exoplanet, and image data)</li>
+    <li>CDS Strasbourg — SIMBAD and VizieR (star and deep-sky catalog data)</li>
+    <li>ESA Gaia archive (used to build the application's datasets)</li>
+    <li>Vercel and Render (application and model hosting)</li>
+    <li>Upstash (transient rate-limit storage)</li>
+  </ul>
+  <p>
+    These services receive only the technical information necessary to fulfill a
+    request and are governed by their own privacy policies.
+  </p>
+
+  <h2>Cookies</h2>
+  <p>
+    The application does not set tracking or advertising cookies. Any storage
+    used is limited to what is technically necessary for the application to
+    function.
+  </p>
+
+  <h2>Your rights</h2>
+  <p>
+    Because the application does not collect or retain personal information beyond
+    the transient, security-purpose processing described above, there is no
+    personal account or profile to access, correct, or delete. If you have a
+    question about this policy, you may contact the maintainer through the
+    project's GitHub repository.
+  </p>
+
+  <h2>Changes</h2>
+  <p>
+    If the application's data practices change (for example, if analytics are
+    added in the future), this policy will be updated to reflect that, and a
+    cookie consent mechanism will be added if required.
+  </p>
+</body>
+</html>
