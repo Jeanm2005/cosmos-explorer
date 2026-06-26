@@ -1,5 +1,6 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import axios from 'axios';
+import { dataLimiter, checkRateLimit } from './_ratelimit';
 
 const NASA_BASE = 'https://api.nasa.gov/neo/rest/v1/feed';
 
@@ -20,6 +21,13 @@ function setCors(req: VercelRequest, res: VercelResponse) {
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
     setCors(req, res);
+
+    const rl = await checkRateLimit(dataLimiter, req);
+    res.setHeader('X-RateLimit-Limit', String(rl.limit));
+    res.setHeader('X-RateLimit-Remaining', String(rl.remaining));
+    if (!rl.ok) {
+        return res.status(429).json({ error: 'Rate limit exceeded. Try again shortly.' });
+    }
 
     if (req.method !== 'GET') {
         return res.status(405).json({ error: 'Method not allowed' });

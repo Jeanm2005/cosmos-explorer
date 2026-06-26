@@ -1,5 +1,6 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import axios from 'axios';
+import { dataLimiter, checkRateLimit} from './_ratelimit';
 
 const ALLOWED_ORIGINS = [
     'https://cosmos-explorer-kappa.vercel.app',
@@ -22,6 +23,12 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     setCors(req, res);
 
     if (req.method !== 'GET') return res.status(405).json({ error: 'Method not allowed' });
+    const rl = await checkRateLimit(dataLimiter, req);
+    res.setHeader('X-RateLimit-Limit', String(rl.limit));
+    res.setHeader('X-RateLimit-Remaining', String(rl.remaining));
+    if (!rl.ok) {
+        return res.status(429).json({ error: 'Rate limit exceeded. Try again shortly.' });
+    }
 
     const { id } = req.query;
     if (!id || typeof id !== 'string') return res.status(400).json({ error: 'id required' });
