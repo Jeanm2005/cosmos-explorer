@@ -23,7 +23,7 @@ export async function checkRateLimit(limiter: Ratelimit, req: VercelRequest) {
     try {
         const { success, limit, remaining } = await limiter.limit(ip);
         return { ok: success, limit, remaining};
-    } catch (err) {
+    } catch {
         return { ok: true, limit: 0, remaining: 0 };
     }
 }

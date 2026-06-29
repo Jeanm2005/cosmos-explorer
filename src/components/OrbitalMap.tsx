@@ -39,6 +39,7 @@ export default function OrbitalMap({ asteroids, size = 600, onSelectAsteroid, se
   const [speed, setSpeed] = useState(5);
   const rafRef = useRef<number | null>(null);
   const currentDate = useMemo(() => new Date(J2000.getTime() + dayOffset * 86400000), [J2000, dayOffset]);
+  const nowOffset = useMemo(() => (Date.now() - J2000.getTime()) / 86400000, [J2000]);
 
   useEffect(() => {
     if (!playing) return;
@@ -115,10 +116,10 @@ export default function OrbitalMap({ asteroids, size = 600, onSelectAsteroid, se
           type="range"
           min={-3650}
           max={3650}
-          value={dayOffset - (Date.now() - J2000.getTime()) / 86400000}
+          value={dayOffset - nowOffset}
           onChange={(e) => {
             setPlaying(false);
-            setDayOffset((Date.now() - J2000.getTime()) / 86400000 + Number(e.target.value));
+            setDayOffset(nowOffset + Number(e.target.value));
           }}
           style={{ flex: 1, accentColor: AMBER, cursor: 'pointer' }}
         />
