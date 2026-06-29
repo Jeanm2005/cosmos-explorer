@@ -93,7 +93,7 @@ export default function NavBar({ isDark, toggle}: { isDark: boolean; toggle: () 
                 {/* Mobile hamburger */}
                 <button
                     className="lg:hidden"
-                    onClick={() => setMenuOpen((o) => !0)}
+                    onClick={() => setMenuOpen((o) => !o)}
                     aria-label="Open menu"
                     style={{
                         width: 32, height: 32, borderRadius: 8,
