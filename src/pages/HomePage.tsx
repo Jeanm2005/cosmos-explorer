@@ -30,7 +30,7 @@ const SECTIONS: Section[] = [
         icon: <Star size={20} />,
     },
     {
-        to: '/exoplants',
+        to: '/exoplanets',
         label: 'Exoplanets',
         tag: 'NASA Exoplanet Archive',
         blurb: 'Explore confirmed exoplanets with discovery methods, orbital data, and an ML model scoring host-star likelihood.',
