@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import type { Asteroid } from '../types';
 import { formatDiameter, formatDistance } from '../utils/normalizers';
+import { HAZARD_COLOR, SAFE_COLOR } from '../utils/neoStyle';
 
 type SortKey = 'name' | 'diameter' | 'distance' | 'velocity' | 'date';
 type SortDir = 'asc' | 'desc';
@@ -112,8 +113,8 @@ export default function AsteroidTable({ asteroids, selectedId, onSelect }: Props
                                 <td style={{ padding: '9px 14px', color: 'var(--muted-foreground)', fontSize: 12 }}>{ca?.date ?? '—'}</td>
                                 <td style={{ padding: '9px 14px' }}>
                                     {asteroid.isPotentiallyHazardous
-                                        ? <span style={{ color: '#ff4d4d', fontSize: 11, fontWeight: 600 }}>⚠ PHA</span>
-                                        : <span style={{ color: 'rgba(77,217,255,0.5)', fontSize: 11 }}>safe</span>}
+                                        ? <span style={{ color: HAZARD_COLOR, fontSize: 11, fontWeight: 600 }}>PHA</span>
+                                        : <span style={{ color: SAFE_COLOR, opacity: 0.75, fontSize: 11 }}>safe</span>}
                                 </td>
                             </tr>
                         );

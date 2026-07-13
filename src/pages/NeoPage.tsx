@@ -7,6 +7,7 @@ import { useNearEarthObjects, getDefaultDateRange } from '../hooks/useNearEarthO
 import PlanetTable from '../components/PlanetTable';
 import type { PlanetData } from '../utils/planetData';
 import { PLANETS } from '../utils/planetData';
+import { HAZARD_COLOR, SAFE_COLOR } from '../utils/neoStyle';
 
 const MONO = "'JetBrains Mono', ui-monospace, monospace";
 const AMBER = '#f59e0b';
@@ -84,7 +85,7 @@ export default function NEOPage() {
           {!isLoading && (
             <div style={{ display: 'flex', gap: 20 }}>
               <Stat label="Total" value={filtered.length} color={AMBER} />
-              <Stat label="Hazardous" value={hazardCount} color="#ff4d4d" />
+              <Stat label="Hazardous" value={hazardCount} color={HAZARD_COLOR} />
               <Stat label="Date range" value={`${filters.dateRange.start} → ${filters.dateRange.end}`} color="var(--muted-foreground)" small />
             </div>
           )}
@@ -100,7 +101,7 @@ export default function NEOPage() {
           </label>
           <div style={{ width: 1, height: 20, background: 'var(--border)' }} />
           <label style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 12, color: 'var(--muted-foreground)', cursor: 'pointer' }}>
-            <input type="checkbox" checked={filters.showHazardousOnly} onChange={(e) => setFilters((f) => ({ ...f, showHazardousOnly: e.target.checked }))} style={{ accentColor: '#ff4d4d' }} />
+            <input type="checkbox" checked={filters.showHazardousOnly} onChange={(e) => setFilters((f) => ({ ...f, showHazardousOnly: e.target.checked }))} style={{ accentColor: HAZARD_COLOR }} />
             Hazardous only
           </label>
           <div style={{ marginLeft: 'auto', fontFamily: MONO, fontSize: 11, color: 'var(--muted-foreground)' }}>NeoWs API · 7-day window max</div>
@@ -126,8 +127,8 @@ export default function NEOPage() {
               />
             </div>
             <div style={{ marginTop: 10, fontFamily: MONO, fontSize: 10, color: 'var(--muted-foreground)', textAlign: 'center' }}>
-              <span style={{ color: '#4dd9ff' }}>●</span> safe &nbsp;
-              <span style={{ color: '#ff4d4d' }}>●</span> potentially hazardous &nbsp;
+              <span style={{ color: SAFE_COLOR }}>●</span> safe &nbsp;
+              <span style={{ color: HAZARD_COLOR }}>●</span> potentially hazardous &nbsp;
               <span style={{ color: '#4fc3f7' }}>●</span> Earth &nbsp;
               <span style={{ color: '#FFD700' }}>●</span> Sun
             </div>

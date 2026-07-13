@@ -4,6 +4,7 @@ import type { Asteroid } from '../types';
 import { generateOrbitPath, auToPixels, bodyPositionAtDate, periodFromSemiMajorAxis } from '../utils/orbitMath';
 import { formatDiameter, formatDistance } from '../utils/normalizers';
 import { PLANETS, COMETS, type OrbitingBody } from '../utils/solarSystemData';
+import { HAZARD_COLOR, SAFE_COLOR } from '../utils/neoStyle';
 
 interface Props {
   asteroids: Asteroid[];
@@ -16,11 +17,11 @@ interface Props {
 
 const ORBIT_STEPS = 180;
 const AMBER = '#f59e0b';
-const hazardColor = '#ff4d4d';
-const safeColor = '#4dd9ff';
+const hazardColor = HAZARD_COLOR;
+const safeColor = SAFE_COLOR;
 const dimOrbitColor = 'rgba(255,255,255,0.08)';
 
-// Zoom presets: maxAU controls how mcuh of the system is visible
+// Zoom presets: maxAU controls how much of the system is visible
 const ZOOM_LEVELS = [
   { label: 'Inner (asteroids)', maxAU: 2.5 },
   { label: 'Inner planets', maxAU: 6 },
@@ -175,7 +176,7 @@ export default function OrbitalMap({ asteroids, size = 600, onSelectAsteroid, se
               fill="none"
               stroke={asteroid.isPotentiallyHazardous
                 ? `rgba(255,77,77,${active ? 0.6 : 0.18})`
-                : active ? 'rgba(77,217,255,0.5)' : dimOrbitColor}
+                : active ? 'rgba(94,234,212,0.5)' : dimOrbitColor}
               strokeWidth={active ? 1.8 : 0.8}
             />
           );
@@ -252,11 +253,12 @@ export default function OrbitalMap({ asteroids, size = 600, onSelectAsteroid, se
       {bodyTip && (
         <div style={{
           position: 'absolute', left: bodyTip.px + 14, top: bodyTip.py - 10,
-          background: 'rgba(10,15,30,0.92)', border: `1px solid ${bodyTip.body.color}`,
-          borderRadius: 6, padding: '6px 10px', pointerEvents: 'none', fontSize: 12, color: '#e0e8ff', zIndex: 10,
+          background: 'rgba(10,13,24,0.88)', backdropFilter: 'blur(6px)', WebkitBackdropFilter: 'blur(6px)',
+          border: `1px solid ${bodyTip.body.color}`,
+          borderRadius: 8, padding: '6px 10px', pointerEvents: 'none', fontSize: 12, color: 'var(--foreground)', zIndex: 10,
         }}>
           <div style={{ fontWeight: 700 }}>{bodyTip.body.name}</div>
-          <div style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 11, color: 'rgba(255,255,255,0.5)' }}>
+          <div style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 11, color: 'var(--muted-foreground)' }}>
             {bodyTip.body.kind === 'comet' ? 'Comet' : 'Planet'} · a = {bodyTip.body.elements.semiMajorAxis.toFixed(2)} AU
           </div>
         </div>
@@ -265,9 +267,9 @@ export default function OrbitalMap({ asteroids, size = 600, onSelectAsteroid, se
         {tooltip && (
           <div style={{
             position: 'absolute', left: tooltip.px + 14, top: tooltip.py - 10,
-            background: 'rgba(10,15,30,0.92)',
-            border: `1px solid ${tooltip.asteroid.isPotentiallyHazardous ? hazardColor: safeColor}`,
-            borderRadius: 6, padding: '8px 12px', pointerEvents: 'none', fontSize: 12, color: '#e0e8ff', maxWidth: 200, zIndex: 10,
+            background: 'rgba(10,13,24,0.88)', backdropFilter: 'blur(6px)', WebkitBackdropFilter: 'blur(6px)',
+            border: `1px solid ${tooltip.asteroid.isPotentiallyHazardous ? hazardColor : safeColor}`,
+            borderRadius: 8, padding: '8px 12px', pointerEvents: 'none', fontSize: 12, color: 'var(--foreground)', maxWidth: 200, zIndex: 10,
           }}>
             <div style={{ fontWeight: 700, marginBottom: 4, fontSize: 13 }}>{tooltip.asteroid.name}</div>
             <div style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 11 }}>Diameter: {formatDiameter(tooltip.asteroid.diameterMin, tooltip.asteroid.diameterMax)}</div>
