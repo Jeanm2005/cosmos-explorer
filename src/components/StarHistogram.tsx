@@ -2,6 +2,8 @@ import { useMemo, useRef, useEffect } from 'react';
 import * as d3 from 'd3';
 import type { Star } from '../types';
 
+const MONO = "'JetBrains Mono', ui-monospace, monospace";
+
 interface Props {
     stars: Star[];
     width?: number;
@@ -46,37 +48,37 @@ export default function StarHistogram({ stars, width = 500, height = 220 }: Prop
             .attr('width', (b) => Math.max(0, x(b.x1!) - x(b.x0!) - 1))
             .attr('y', (b) => y(b.length))
             .attr('height', (b) => innerH - y(b.length))
-            .attr('fill', '#4dd9ff')
-            .attr('opacity', 0.7);
+            .attr('fill', '#aabfff')
+            .attr('opacity', 0.65);
 
         // X axis
         g.append('g')
             .attr('transform', `translate(0,${innerH})`)
             .call(d3.axisBottom(x).ticks(8).tickFormat((d) => `${d}`))
             .call((ax: d3.Selection<SVGGElement, unknown, null, undefined>) => {
-                ax.selectAll('text').attr('fill', 'rgba(255,255,255,0.5)').attr('font-size', 10);
-                ax.selectAll('line,path').attr('stroke', 'rgba(255,255,255,0.15)');
+                ax.selectAll('text').style('fill', 'var(--muted-foreground)').style('font-family', MONO).style('font-size', '10px');
+                ax.selectAll('line,path').style('stroke', 'var(--border)');
             });
 
         // Y axis
         g.append('g')
             .call(d3.axisLeft(y).ticks(4))
             .call((ax: d3.Selection<SVGGElement, unknown, null, undefined>) => {
-                ax.selectAll('text').attr('fill', 'rgba(255,255,255,0.5)').attr('font-size', 10);
-                ax.selectAll('line,path').attr('stroke', 'rgba(255,255,255,0.15)');
+                ax.selectAll('text').style('fill', 'var(--muted-foreground)').style('font-family', MONO).style('font-size', '10px');
+                ax.selectAll('line,path').style('stroke', 'var(--border)');
             });
 
         // X label
         g.append('text')
             .attr('x', innerW / 2).attr('y', innerH + 34)
-            .attr('text-anchor', 'middle').attr('fill', 'rgba(255,255,255,0.35)').attr('font-size', 11)
+            .attr('text-anchor', 'middle').style('fill', 'var(--muted-foreground)').style('font-family', MONO).style('font-size', '10px')
             .text('Visual Magnitude (V)');
 
         // Y label
         g.append('text')
             .attr('transform', 'rotate(-90)')
             .attr('x', -innerH / 2).attr('y', -34)
-            .attr('text-anchor', 'middle').attr('fill', 'rgba(255,255,255,0.35)').attr('font-size', 11)
+            .attr('text-anchor', 'middle').style('fill', 'var(--muted-foreground)').style('font-family', MONO).style('font-size', '10px')
             .text('Star Count');
     }, [bins, innerW, innerH]);
 
