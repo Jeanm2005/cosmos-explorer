@@ -7,6 +7,7 @@ import HomePage from './pages/HomePage';
 import StarCatalogPage from './pages/StarCatalogPage';
 import ExoplanetPage from './pages/ExoplanetPage';
 import DeepSkyPage from './pages/DeepSkyPage';
+import AboutPage from './pages/AboutPage';
 import CosmicBackground from './components/CosmicBackground';
 
 const queryClient = new QueryClient({
@@ -26,7 +27,7 @@ function Shell() {
           <Route path="/exoplanets" element={<ExoplanetPage />} />
           <Route path="/neos" element={<NeoPage />} />
           <Route path="/deepsky" element={<DeepSkyPage />} />
-          {/* /about wired next once its page is in */}
+          <Route path="/about" element={<AboutPage />} />
         </Routes>
       </main>
     </div>
