@@ -1,7 +1,7 @@
 import { X } from 'lucide-react';
 import type { DeepSkyObject } from '../hooks/useDeepSkyObjects';
 import NASAImagePanel from './NASAImagePanel';
-import { DSO_TYPE_COLORS, DSO_TYPE_ICONS } from '../utils/dsoStyle';
+import { DSO_TYPE_COLORS, DSO_TYPE_ICONS } from '../utils/DSOStyle';
 
 const MONO = "'JetBrains Mono', ui-monospace, monospace";
 

@@ -2,6 +2,8 @@ import { X, Sprout, Info } from 'lucide-react';
 import type { Exoplanet } from '../hooks/useExoplanets';
 import NASAImagePanel from './NASAImagePanel';
 import HostLikelihoodPanel from './HostLikelihoodPanel';
+import InterpretationPanel from './InterpretationPanel';
+import { useHostLikelihood } from '../hooks/useHostLikelihood';
 import { findHostParams, curatedStarList } from '../utils/curatedStars';
 
 const curatedCount = curatedStarList.length;
@@ -42,6 +44,10 @@ function getSizeClass(radius: number | null): string {
 
 export default function ExoplanetCard({ exoplanet, onClose }: Props) {
     const color = getPlanetColor(exoplanet.radius);
+    const hostParams = findHostParams(exoplanet.hostStar);
+    // Same queryKey as HostLikelihoodPanel's own call, so React Query serves this
+    // from cache rather than issuing a second request to the model service.
+    const { data: hostScore } = useHostLikelihood(hostParams);
     const dotSize = Math.min(60, Math.max(16, (exoplanet.radius ?? 4) * 8));
  
     return (
@@ -86,7 +92,6 @@ export default function ExoplanetCard({ exoplanet, onClose }: Props) {
                 discoveryYear={exoplanet.discoveryYear}
             />
             {(() => {
-                const hostParams = findHostParams(exoplanet.hostStar);
                 return hostParams ? (
                     <HostLikelihoodPanel params={hostParams} starName={exoplanet.hostStar} />
                 ) : (
@@ -96,6 +101,8 @@ export default function ExoplanetCard({ exoplanet, onClose }: Props) {
                     </div>
                 );
             })()}
+
+            <InterpretationPanel planet={exoplanet} hostScore={hostScore} />
         </div>
     );
 }

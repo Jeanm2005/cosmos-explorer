@@ -32,3 +32,4 @@ ml/data/*
 
 __pycache__/
 *.pyc
+*.tsbuildinfo
