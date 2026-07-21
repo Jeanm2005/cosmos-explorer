@@ -144,7 +144,6 @@ export default function StarCatalogPage() {
                 ))}
                 <NASAImagePanel
                   query={selectedStar.name ?? selectedStar.id}
-                  fallback="Hubble space telescope star"
                   objectType="star"
                 />
                 <StellarPhysicsPanel

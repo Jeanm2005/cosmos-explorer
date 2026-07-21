@@ -87,7 +87,6 @@ export default function ExoplanetCard({ exoplanet, onClose }: Props) {
  
             <NASAImagePanel
                 query={exoplanet.name}
-                fallback={`${exoplanet.hostStar} star`}
                 objectType="exoplanet"
                 discoveryYear={exoplanet.discoveryYear}
             />
