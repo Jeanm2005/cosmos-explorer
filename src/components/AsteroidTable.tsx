@@ -1,9 +1,13 @@
 import { useState } from 'react';
 import type { Asteroid } from '../types';
 import { formatDiameter, formatDistance } from '../utils/normalizers';
+import { HAZARD_COLOR, SAFE_COLOR } from '../utils/neoStyle';
 
 type SortKey = 'name' | 'diameter' | 'distance' | 'velocity' | 'date';
 type SortDir = 'asc' | 'desc';
+
+const MONO = "'JetBrains Mono', ui-monospace, monospace";
+const AMBER = '#f59e0b';
 
 interface Props {
     asteroids: Asteroid[];
@@ -15,6 +19,35 @@ function getClosest(a: Asteroid) {
     return a.closeApproaches.reduce(
         (min, ca) => (ca.distanceAU < min.distanceAU ? ca : min),
         a.closeApproaches[0]
+    );
+}
+
+// Hoisted out of the render body so it isn't recreated each render.
+// Receives sort state and the handler as props.
+function ColHeader({
+    label, k, sortKey, sortDir, onSort,
+}: {
+    label: string;
+    k: SortKey;
+    sortKey: SortKey;
+    sortDir: SortDir;
+    onSort: (k: SortKey) => void;
+}) {
+    const active = sortKey === k;
+    return (
+        <th
+            onClick={() => onSort(k)}
+            style={{
+                cursor: 'pointer', padding: '10px 14px', textAlign: 'left',
+                fontFamily: MONO, fontWeight: active ? 700 : 500,
+                color: active ? AMBER : 'var(--muted-foreground)',
+                fontSize: 10, letterSpacing: '0.06em', textTransform: 'uppercase',
+                whiteSpace: 'nowrap', userSelect: 'none',
+                borderBottom: '1px solid var(--border)',
+            }}
+        >
+            {label} {active ? (sortDir === 'asc' ? '↑' : '↓') : ''}
+        </th>
     );
 }
 
@@ -41,26 +74,19 @@ export default function AsteroidTable({ asteroids, selectedId, onSelect }: Props
         return sortDir === 'asc' ? cmp : -cmp;
     });
 
-    function ColHeader({ label, k }: { label: string; k: SortKey }) {
-        const active = sortKey === k;
-        return (
-            <th onClick={() => handleSort(k)} style={{ cursor: 'pointer', padding: '10px 14px', textAlign: 'left', fontWeight: active ? 700 : 500, color: active ? '#4dd9ff' : 'rgba(255,255,2550.55)', fontSize: 11, letterSpacing: '0.08em', textTransform: 'uppercase', whiteSpace: 'nowrap', userSelect: 'none', borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
-                {label} {active ? (sortDir === 'asc' ? '↑' : '↓') : ''}
-            </th>
-        );
-    }
+    const headerProps = { sortKey, sortDir, onSort: handleSort };
 
     return (
         <div style={{ overflowX: 'auto', overflowY: 'auto', maxHeight: '60vh' }}>
-            <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
-                <thead style={{ position: 'sticky', top: 0, background: '#0a0f1e', zIndex: 2 }}>
+            <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13, fontFamily: MONO }}>
+                <thead style={{ position: 'sticky', top: 0, background: '#0a1020', zIndex: 2 }}>
                     <tr>
-                        <ColHeader label="Name" k="name" />
-                        <ColHeader label="Diameter" k="diameter" />
-                        <ColHeader label="Miss Distance" k="distance" />
-                        <ColHeader label="Velocity (km/s)" k="velocity" />
-                        <ColHeader label="Date" k="date" />
-                        <th style={{ padding: '10px 14px', color: 'rgba(255,255,255,0.55)', fontSize: 11, letterSpacing: '0.08em', textTransform: 'uppercase', borderBottom: '1px solid rgba(255,255,255,0.08)' }}>Risk</th>
+                        <ColHeader label="Name" k="name" {...headerProps} />
+                        <ColHeader label="Diameter" k="diameter" {...headerProps} />
+                        <ColHeader label="Miss Distance" k="distance" {...headerProps} />
+                        <ColHeader label="Velocity (km/s)" k="velocity" {...headerProps} />
+                        <ColHeader label="Date" k="date" {...headerProps} />
+                        <th style={{ padding: '10px 14px', fontFamily: MONO, color: 'var(--muted-foreground)', fontSize: 10, letterSpacing: '0.06em', textTransform: 'uppercase', borderBottom: '1px solid var(--border)' }}>Risk</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -68,20 +94,27 @@ export default function AsteroidTable({ asteroids, selectedId, onSelect }: Props
                         const ca = getClosest(asteroid);
                         const isSelected = selectedId === asteroid.id;
                         return (
-                            <tr key={asteroid.id} onClick={() => onSelect(asteroid)}
-                                style={{ cursor: 'pointer', background: isSelected ? 'rgba(77,217,255,0.07)' : 'transparent', borderLeft: isSelected ? '2px solid #4dd9ff' : '2px solid transparent', transition: 'background 0.15s' }}
+                            <tr
+                                key={asteroid.id}
+                                onClick={() => onSelect(asteroid)}
+                                style={{
+                                    cursor: 'pointer',
+                                    background: isSelected ? 'rgba(245,158,11,0.08)' : 'transparent',
+                                    borderLeft: isSelected ? `2px solid ${AMBER}` : '2px solid transparent',
+                                    transition: 'background 0.15s',
+                                }}
                                 onMouseEnter={(e) => { if (!isSelected) (e.currentTarget as HTMLTableRowElement).style.background = 'rgba(255,255,255,0.04)'; }}
                                 onMouseLeave={(e) => { if (!isSelected) (e.currentTarget as HTMLTableRowElement).style.background = 'transparent'; }}
                             >
-                                <td style={{ padding: '9px 14px', color: '#e0e8ff', fontWeight: isSelected ? 600 : 400 }}>{asteroid.name}</td>
-                                <td style={{ padding: '9px 14px', color: 'rgba(255,255,255,0.7)' }}>{formatDiameter(asteroid.diameterMin, asteroid.diameterMax)}</td>
-                                <td style={{ padding: '9px 14px', color: 'rgba(255,255,255,0.7)' }}>{ca ? formatDistance(ca.distanceAU) : '—'}</td>
-                                <td style={{ padding: '9px 14px', color: 'rgba(255,255,255,0.7)' }}>{ca ? ca.relativeVelocityKmS.toFixed(2) : '—'}</td>
-                                <td style={{ padding: '9px 14px', color: 'rgba(255,255,255,0.5)', fontSize: 12 }}>{ca?.date ?? '—'}</td>
+                                <td style={{ padding: '9px 14px', color: 'var(--foreground)', fontWeight: isSelected ? 600 : 400 }}>{asteroid.name}</td>
+                                <td style={{ padding: '9px 14px', color: 'var(--muted-foreground)' }}>{formatDiameter(asteroid.diameterMin, asteroid.diameterMax)}</td>
+                                <td style={{ padding: '9px 14px', color: 'var(--muted-foreground)' }}>{ca ? formatDistance(ca.distanceAU) : '—'}</td>
+                                <td style={{ padding: '9px 14px', color: 'var(--muted-foreground)' }}>{ca ? ca.relativeVelocityKmS.toFixed(2) : '—'}</td>
+                                <td style={{ padding: '9px 14px', color: 'var(--muted-foreground)', fontSize: 12 }}>{ca?.date ?? '—'}</td>
                                 <td style={{ padding: '9px 14px' }}>
                                     {asteroid.isPotentiallyHazardous
-                                        ? <span style={{ color: '#ff4d4d', fontSize: 11, fontWeight: 600 }}>⚠ PHA</span>
-                                        : <span style={{ color: 'rgba(77,217,255,0.5)', fontSize: 11 }}>safe</span>}
+                                        ? <span style={{ color: HAZARD_COLOR, fontSize: 11, fontWeight: 600 }}>PHA</span>
+                                        : <span style={{ color: SAFE_COLOR, opacity: 0.75, fontSize: 11 }}>safe</span>}
                                 </td>
                             </tr>
                         );
@@ -89,7 +122,7 @@ export default function AsteroidTable({ asteroids, selectedId, onSelect }: Props
                 </tbody>
             </table>
             {sorted.length === 0 && (
-                <div style={{ textAlign: 'center', padding: '40px 0', color: 'rgba(255,255,255,0.3)', fontSize: 13 }}>
+                <div style={{ textAlign: 'center', padding: '40px 0', color: 'var(--muted-foreground)', fontSize: 13 }}>
                     No asteroids found for selected filters.
                 </div>
             )}

@@ -67,7 +67,7 @@ export default function StarField({ stars, width = 700, height = 500, onSelectSt
             if (isSelected) {
                 ctx.beginPath();
                 ctx.arc(x, y, r + 4, 0, Math.PI * 2);
-                ctx.fillStyle = 'rgba(77,217,255,0.2)';
+                ctx.fillStyle = 'rgba(170,191,255,0.25)';
                 ctx.fill();
             }
 
@@ -119,16 +119,18 @@ export default function StarField({ stars, width = 700, height = 500, onSelectSt
             {tooltip && (
                 <div style={{
                     position: 'absolute', left: tooltip.x + 12, top: tooltip.y - 10,
-                    background: 'rgba(10,15,30,0.92)', border: '1px solid rgba(77,217,255,0.3)',
-                    borderRadius: 6, padding: '8px 12px', pointerEvents: 'none',
-                    fontSize: 12, color: '#e0e8ff', zIndex: 10,
+                    background: 'rgba(10,13,24,0.88)', backdropFilter: 'blur(6px)', WebkitBackdropFilter: 'blur(6px)',
+                    border: '1px solid rgba(170,191,255,0.35)',
+                    borderRadius: 8, padding: '8px 12px', pointerEvents: 'none',
+                    fontFamily: "'JetBrains Mono', ui-monospace, monospace",
+                    fontSize: 11, color: 'var(--foreground)', zIndex: 10, whiteSpace: 'nowrap',
                 }}>
                     <div style={{ fontWeight: 700, marginBottom: 3 }}>{tooltip.star.id}</div>
                     <div>Magnitude: {tooltip.star.magnitude.toFixed(2)}</div>
                     {tooltip.star.colorIndex !== undefined && (
                         <div>B-V: {tooltip.star.colorIndex.toFixed(3)}</div>
                     )}
-                    <div style={{ color: 'rgba(255,255,255,0.4)', fontSize: 10, marginTop: 3 }}>
+                    <div style={{ color: 'var(--muted-foreground)', fontSize: 10, marginTop: 3 }}>
                         RA {tooltip.star.ra.toFixed(4)}° / Dec {tooltip.star.dec.toFixed(4)}°
                     </div>
                 </div>

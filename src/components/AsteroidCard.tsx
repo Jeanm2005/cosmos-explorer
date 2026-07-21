@@ -1,6 +1,10 @@
+import { X, TriangleAlert } from 'lucide-react';
 import type { Asteroid } from '../types';
 import { formatDiameter, formatDistance } from '../utils/normalizers';
 import NASAImagePanel from './NASAImagePanel';
+import { HAZARD_COLOR, SAFE_COLOR } from '../utils/neoStyle';
+
+const MONO = "'JetBrains Mono', ui-monospace, monospace";
 
 interface Props {
     asteroid: Asteroid;
@@ -9,56 +13,74 @@ interface Props {
 
 function DataRow({ label, value }: { label: string; value: string | number }) {
     return (
-        <div style={{ display: 'flex', justifyContent: 'space-between', padding: '5px 0', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
-            <span style={{ color: 'rgba(255,255,255,0.45)', fontSize: 12 }}>{label}</span>
-            <span style={{ color: '#e0e8ff', fontSize: 12, fontWeight: 500 }}>{value}</span>
+        <div style={{ display: 'flex', justifyContent: 'space-between', padding: '5px 0', borderBottom: '1px solid var(--border)' }}>
+            <span style={{ color: 'var(--muted-foreground)', fontSize: 12 }}>{label}</span>
+            <span style={{ color: 'var(--foreground)', fontFamily: MONO, fontSize: 12, fontWeight: 500 }}>{value}</span>
+        </div>
+    );
+}
+
+function SectionLabel({ children }: { children: React.ReactNode }) {
+    return (
+        <div style={{ fontFamily: MONO, fontSize: 10, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--muted-foreground)', marginBottom: 8 }}>
+            {children}
         </div>
     );
 }
 
 export default function AsteroidCard({ asteroid, onClose }: Props) {
     const oe = asteroid.orbitalElements;
+    const statusColor = asteroid.isPotentiallyHazardous ? HAZARD_COLOR : SAFE_COLOR;
+
     return (
-        <div style={{ background: 'rgba(10,15,30,0.97)', border: `1px solid ${asteroid.isPotentiallyHazardous ? 'rgba(255,77,77,0.4' : 'rgba(77,217,255,0.5)'}`, borderRadius: 10, padding: '20px', position: 'relative' }}>
-            <button onClick={onClose} style={{ position: 'absolute', top: 14, right: 14, background: 'none', border: 'none', color: 'rgba(255,255,255,0.4)', cursor: 'pointer', fontSize: 18 }}>×</button>
+        <div style={{ background: 'rgba(10,13,24,0.82)', backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)', border: `1px solid ${statusColor}66`, borderRadius: 12, padding: 20, position: 'relative' }}>
+            <button onClick={onClose} aria-label="Close"
+                style={{ position: 'absolute', top: 14, right: 14, background: 'none', border: 'none', color: 'var(--muted-foreground)', cursor: 'pointer', display: 'flex', padding: 2 }}>
+                <X size={18} />
+            </button>
+
             <div style={{ marginBottom: 16 }}>
-                <h3 style={{ margin: 0, fontSize: 17, color: '#e0e8ff', fontWeight: 700 }}>{asteroid.name}</h3>
-                <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.35)', marginTop: 3 }}>Designation: {asteroid.designation}</div>
+                <h3 style={{ margin: 0, fontFamily: 'Orbitron, sans-serif', fontSize: 16, color: 'var(--foreground)', fontWeight: 700 }}>{asteroid.name}</h3>
+                <div style={{ fontFamily: MONO, fontSize: 11, color: 'var(--muted-foreground)', marginTop: 4 }}>{asteroid.designation}</div>
                 {asteroid.isPotentiallyHazardous && (
-                    <div style={{ marginTop: 8, padding: '5px 10px', background: 'rgba(255,77,77,0.1)', border: '1px solid rgba(255,77,77,0.3)', borderRadius: 4, color: '#ff4d4d', fontSize: 11, fontWeight: 600, display: 'inline-block' }}>
-                        ⚠ POTENTIALLY HAZARDOUS ASTEROID
+                    <div style={{ marginTop: 8, padding: '4px 9px', background: `${HAZARD_COLOR}1a`, border: `1px solid ${HAZARD_COLOR}55`, borderRadius: 5, color: HAZARD_COLOR, fontFamily: MONO, fontSize: 10, fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: 5, letterSpacing: '0.05em' }}>
+                        <TriangleAlert size={11} /> POTENTIALLY HAZARDOUS
                     </div>
                 )}
             </div>
+
             <div style={{ marginBottom: 14 }}>
-                <div style={{ fontSize: 10, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.3)', marginBottom: 8 }}>Physical Properties</div>
+                <SectionLabel>Physical Properties</SectionLabel>
                 <DataRow label="Diameter" value={formatDiameter(asteroid.diameterMin, asteroid.diameterMax)} />
                 <DataRow label="Abs. Magnitude (H)" value={asteroid.absoluteMagnitude.toFixed(1)} />
             </div>
+
             <div style={{ marginBottom: 14 }}>
-                <div style={{ fontSize: 10, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.3)', marginBottom: 8 }}>Orbital Elements</div>
+                <SectionLabel>Orbital Elements</SectionLabel>
                 <DataRow label="Semi-major axis" value={`${oe.semiMajorAxis.toFixed(4)} AU`} />
                 <DataRow label="Eccentricity" value={oe.eccentricity.toFixed(5)} />
                 <DataRow label="Inclination" value={`${oe.inclination.toFixed(3)}°`} />
                 <DataRow label="Arg. of perihelion" value={`${oe.argumentOfPerihelion.toFixed(3)}°`} />
                 <DataRow label="Mean anomaly" value={`${oe.meanAnomaly.toFixed(3)}°`} />
             </div>
+
             {asteroid.closeApproaches.length > 0 && (
                 <div>
-                    <div style={{ fontSize: 10, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.3)', marginBottom: 8 }}>Close Approaches</div>
+                    <SectionLabel>Close Approaches</SectionLabel>
                     {asteroid.closeApproaches.slice(0, 5).map((ca, i) => (
-                        <div key={i} style={{ padding: '8px 0', borderBottom: '1px solid rgba(255,255,255,0.05)', display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 4 }}>
-                            <span style={{ fontSize: 11, color: '#e0e8ff' }}>{ca.date}</span>
-                            <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.6)' }}>{formatDistance(ca.distanceAU)}</span>
-                            <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.5)' }}>{ca.relativeVelocityKmS.toFixed(1)} km/s</span>
+                        <div key={i} style={{ padding: '8px 0', borderBottom: '1px solid var(--border)', display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 4, fontFamily: MONO, fontSize: 11 }}>
+                            <span style={{ color: 'var(--foreground)' }}>{ca.date}</span>
+                            <span style={{ color: 'var(--muted-foreground)' }}>{formatDistance(ca.distanceAU)}</span>
+                            <span style={{ color: 'var(--muted-foreground)' }}>{ca.relativeVelocityKmS.toFixed(1)} km/s</span>
                         </div>
                     ))}
                 </div>
             )}
-            <NASAImagePanel 
+
+            <NASAImagePanel
                 query={asteroid.name}
                 fallback="asteroid NASA close up"
-                objectType="asteroid" 
+                objectType="asteroid"
             />
         </div>
     );

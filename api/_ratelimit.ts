@@ -6,8 +6,15 @@ const redis = Redis.fromEnv();
 
 export const dataLimiter = new Ratelimit({
     redis,
-    limiter: Ratelimit.slidingWindow(20, '60 s'),
+    limiter: Ratelimit.slidingWindow(40, '60 s'),
     prefix: 'rl:data',
+    analytics: true,
+});
+
+export const llmLimiter = new Ratelimit({
+    redis,
+    limiter: Ratelimit.slidingWindow(10, '60 s'),
+    prefix: 'rl:llm',
     analytics: true,
 });
 
@@ -22,8 +29,8 @@ export async function checkRateLimit(limiter: Ratelimit, req: VercelRequest) {
     const ip = clientIp(req);
     try {
         const { success, limit, remaining } = await limiter.limit(ip);
-        return { ok: success, limit, remaining};
-    } catch (err) {
+        return { ok: success, limit, remaining };
+    } catch {
         return { ok: true, limit: 0, remaining: 0 };
     }
 }

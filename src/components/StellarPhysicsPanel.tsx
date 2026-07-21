@@ -1,5 +1,9 @@
 import { deriveStellar } from '../utils/stellarPhysics';
 
+const ACCENT = '#aabfff';
+const HZ_GREEN = '#34d399';
+const MONO = "'JetBrains Mono', ui-monospace, monospace";
+
 interface Props {
   colorIndex?: number;
   magnitude: number;
@@ -9,9 +13,9 @@ interface Props {
 
 function Row({ label, value }: { label: string; value: string }) {
   return (
-    <div style={{ display: 'flex', justifyContent: 'space-between', padding: '5px 0', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
-      <span style={{ color: 'rgba(255,255,255,0.45)', fontSize: 12 }}>{label}</span>
-      <span style={{ color: '#e0e8ff', fontSize: 12, fontWeight: 500 }}>{value}</span>
+    <div style={{ display: 'flex', justifyContent: 'space-between', padding: '5px 0', borderBottom: '1px solid var(--border)' }}>
+      <span style={{ color: 'var(--muted-foreground)', fontSize: 12 }}>{label}</span>
+      <span style={{ color: 'var(--foreground)', fontFamily: MONO, fontSize: 12, fontWeight: 500 }}>{value}</span>
     </div>
   );
 }
@@ -20,12 +24,12 @@ export default function StellarPhysicsPanel({ colorIndex, magnitude, distance }:
   const { tempK, luminosity, spectral, hz } = deriveStellar({ colorIndex, magnitude, distance });
 
   return (
-    <div style={{ marginTop: 16, padding: '14px 16px', background: 'rgba(10,15,30,0.6)', border: '1px solid rgba(77,217,255,0.15)', borderRadius: 10 }}>
-      <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 12 }}>
+    <div style={{ marginTop: 16, padding: '14px 16px', background: 'rgba(255,255,255,0.03)', border: `1px solid ${ACCENT}33`, borderRadius: 10 }}>
+      <div style={{ fontFamily: MONO, fontSize: 11, color: 'var(--muted-foreground)', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 12 }}>
         Stellar Physics
       </div>
 
-      {/* Spectral class badge */}
+      {/* Spectral class badge — color comes from the real spectral classification */}
       {spectral ? (
         <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 14 }}>
           <div style={{
@@ -34,14 +38,14 @@ export default function StellarPhysicsPanel({ colorIndex, magnitude, distance }:
             boxShadow: `0 0 18px ${spectral.color}55`,
           }} />
           <div>
-            <div style={{ fontSize: 22, fontWeight: 700, color: spectral.color }}>
+            <div style={{ fontFamily: MONO, fontSize: 22, fontWeight: 700, color: spectral.color }}>
               Type {spectral.letter}
             </div>
-            <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.5)' }}>{spectral.label}</div>
+            <div style={{ fontSize: 12, color: 'var(--muted-foreground)' }}>{spectral.label}</div>
           </div>
         </div>
       ) : (
-        <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.35)', marginBottom: 12 }}>
+        <div style={{ fontSize: 11, color: 'var(--muted-foreground)', marginBottom: 12 }}>
           Spectral class unavailable (no color index for this star).
         </div>
       )}
@@ -56,20 +60,19 @@ export default function StellarPhysicsPanel({ colorIndex, magnitude, distance }:
       {/* Habitable zone */}
       {hz ? (
         <div style={{ marginTop: 14 }}>
-          <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.35)', marginBottom: 8, letterSpacing: '0.05em', textTransform: 'uppercase' }}>
+          <div style={{ fontFamily: MONO, fontSize: 10, color: 'var(--muted-foreground)', marginBottom: 8, letterSpacing: '0.05em', textTransform: 'uppercase' }}>
             Habitable Zone
           </div>
-          <div style={{ fontSize: 13, color: '#81c784', fontWeight: 600, marginBottom: 8 }}>
+          <div style={{ fontFamily: MONO, fontSize: 13, color: HZ_GREEN, fontWeight: 600, marginBottom: 8 }}>
             {hz.inner.toFixed(2)} – {hz.outer.toFixed(2)} AU
           </div>
-          {/* Simple visual: HZ band on a log-ish AU scale */}
           <HZBar inner={hz.inner} outer={hz.outer} />
-          <div style={{ fontSize: 9.5, color: 'rgba(255,255,255,0.3)', marginTop: 8, lineHeight: 1.5 }}>
+          <div style={{ fontSize: 9.5, color: 'var(--muted-foreground)', opacity: 0.8, marginTop: 8, lineHeight: 1.5 }}>
             Range where liquid water could exist on a planet's surface, scaled from stellar luminosity (Kopparapu-style boundaries).
           </div>
         </div>
       ) : (
-        <div style={{ marginTop: 12, fontSize: 11, color: 'rgba(255,255,255,0.35)', lineHeight: 1.5 }}>
+        <div style={{ marginTop: 12, fontSize: 11, color: 'var(--muted-foreground)', lineHeight: 1.5 }}>
           Habitable zone needs luminosity, which requires distance — not available for this star.
         </div>
       )}
@@ -88,10 +91,10 @@ function HZBar({ inner, outer }: { inner: number; outer: number }) {
     <div style={{ position: 'relative', height: 10, background: 'rgba(255,255,255,0.06)', borderRadius: 5, overflow: 'hidden' }}>
       <div style={{
         position: 'absolute', left: `${left}%`, width: `${width}%`, height: '100%',
-        background: 'linear-gradient(90deg, rgba(129,199,132,0.7), rgba(77,217,255,0.7))',
+        background: `linear-gradient(90deg, ${HZ_GREEN}b3, ${ACCENT}b3)`,
       }} />
       {/* Earth reference marker at 1 AU */}
-      <div style={{ position: 'absolute', left: `${pct(1)}%`, top: -2, width: 1, height: 14, background: 'rgba(255,255,255,0.5)' }} title="1 AU (Earth)" />
+      <div style={{ position: 'absolute', left: `${pct(1)}%`, top: -2, width: 1, height: 14, background: 'var(--muted-foreground)' }} title="1 AU (Earth)" />
     </div>
   );
 }

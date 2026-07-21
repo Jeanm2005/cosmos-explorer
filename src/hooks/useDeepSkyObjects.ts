@@ -74,11 +74,31 @@ async function fetchDSO(identifier: string): Promise<DeepSkyObject | null> {
     }
 }
 
+// Run workers over `items` with bounded concurrency so we don't fire all ~31
+// SIMBAD lookups at once (which bursts past the proxy rate limit and can time
+// out the upstream). fetchDSO never throws — it resolves to null on failure.
+async function fetchWithConcurrency(
+    items: string[],
+    worker: (item: string) => Promise<DeepSkyObject | null>,
+    concurrency = 5,
+): Promise<(DeepSkyObject | null)[]> {
+    const results: (DeepSkyObject | null)[] = new Array(items.length).fill(null);
+    let cursor = 0;
+    async function runner() {
+        while (cursor < items.length) {
+            const i = cursor++;
+            results[i] = await worker(items[i]);
+        }
+    }
+    await Promise.all(
+        Array.from({ length: Math.min(concurrency, items.length) }, runner),
+    );
+    return results;
+}
+
 async function fetchAllDSOs(): Promise<DeepSkyObject[]> {
-    const results = await Promise.allSettled(DSO_IDENTIFIERS.map(fetchDSO));
-    return results
-        .filter((r): r is PromiseFulfilledResult<DeepSkyObject> => r.status === 'fulfilled' && r.value !== null)
-        .map((r) => r.value);
+    const results = await fetchWithConcurrency(DSO_IDENTIFIERS, fetchDSO, 5);
+    return results.filter((v): v is DeepSkyObject => v !== null);
 }
 
 export function useDeepSkyObjects() {
