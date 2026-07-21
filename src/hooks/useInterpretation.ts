@@ -38,7 +38,7 @@ export function buildPayload(planet: Exoplanet, hostScore?: HostLikelihoodResult
 }
 
 async function fetchInterpretation(payload: InterpretPayload): Promise<string> {
-    const { data } = await axios.post<{ interpretation: string }>('/api/interpreter', payload, {
+    const { data } = await axios.post<{ interpretation: string }>('/api/interpret', payload, {
         timeout: 30000,
     });
     return data.interpretation;
