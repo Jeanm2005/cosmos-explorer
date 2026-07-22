@@ -8,7 +8,7 @@ const ALLOWED_ORIGINS = [
     'https://localhost:3000',
 ];
 
-const ANTHROPIC_URL = 'https://api.anthropic.com/v1/complete';
+const ANTHROPIC_URL = 'https://api.anthropic.com/v1/messages';
 const MODEL = 'claude-haiku-4-5-20251001';
 
 function setCors(req: VercelRequest, res: VercelResponse) {
@@ -21,16 +21,14 @@ function setCors(req: VercelRequest, res: VercelResponse) {
     res.setHeader('Vary', 'Origin');
 }
 
-/** Only finite numbers survive */
 function num(v: unknown): number | null {
-    return typeof v === 'number' && isFinite(v) ? v : null;
+    return typeof v === 'number' && Number.isFinite(v) ? v : null;
 }
 
-/** Names are the only free text that is accepted. They are tightly bound */
 function name(v: unknown): string | null {
     if (typeof v !== 'string') return null;
     const trimmed = v.trim().slice(0, 64);
-    return /^[A-Za-z0-9 +\-*.'()']{1,64}$/.test(trimmed) ? trimmed : null;
+    return /^[A-Za-z0-9 +\-*.'()]{1,64}$/.test(trimmed) ? trimmed : null;
 }
 
 interface Facts {
@@ -39,11 +37,11 @@ interface Facts {
     radiusEarth: number | null;
     massEarth: number | null;
     orbitalPeriodDays: number | null;
-    semiMajorAxisAU: number | null;
+    semiMajorAxisAu: number | null;
     equilibriumTempK: number | null;
     distancePc: number | null;
-    discoveryYear: number | null;
     discoveryMethod: string | null;
+    discoveryYear: number | null;
     inHabitableZone: boolean;
     hostLikelihood: number | null;
     featureImportance: Record<string, number> | null;
@@ -76,11 +74,11 @@ function sanitize(body: unknown): Facts | null {
         radiusEarth: num(b.radiusEarth),
         massEarth: num(b.massEarth),
         orbitalPeriodDays: num(b.orbitalPeriodDays),
-        semiMajorAxisAU: num(b.semiMajorAxisAU),
+        semiMajorAxisAu: num(b.semiMajorAxisAu),
         equilibriumTempK: num(b.equilibriumTempK),
         distancePc: num(b.distancePc),
-        discoveryYear: num(b.discoveryYear),
         discoveryMethod: name(b.discoveryMethod),
+        discoveryYear: num(b.discoveryYear),
         inHabitableZone: b.inHabitableZone === true,
         hostLikelihood: hl !== null && hl >= 0 && hl <= 1 ? hl : null,
         featureImportance,
@@ -88,16 +86,16 @@ function sanitize(body: unknown): Facts | null {
 }
 
 const SYSTEM_PROMPT = `You explain astronomical data to curious non-specialists inside an app called Cosmos Explorer.
- 
+
 You will receive a JSON object of measurements for one confirmed exoplanet, drawn from the NASA Exoplanet Archive, plus (sometimes) a machine-learning "host-likelihood" score for its host star.
- 
+
 Rules, in order of importance:
 1. Use ONLY the numbers in the JSON. Never introduce a fact, name, mission, or figure that is not there. You have no other knowledge of this planet.
 2. A null or missing field means the value is unknown. Say it is unknown, or stay silent about it. Never estimate, infer, or fill it in.
 3. The host-likelihood score is NOT evidence about this planet. The planet is already confirmed to exist. The score only reflects how planet-hosting-typical the star's properties are, from a weak model (ROC-AUC about 0.70) trained on Gaia stellar parameters. Never phrase it as a probability that the planet exists, or that more planets are present. If the score is high or low, say what it means about the STAR being typical or unusual among known hosts, and note the model is weak.
 4. Do not speculate about habitability, life, or colonisation. If the planet sits in the habitable zone, that is a statement about the orbital distance where liquid water could exist given the star's output — nothing more. Equilibrium temperature ignores atmosphere.
 5. Be concrete. Compare to Earth, the Sun, or the Solar System where the JSON supports it (e.g. an orbital period of 3 days is far tighter than Mercury's 88).
- 
+
 Write 2 to 4 short paragraphs of plain prose. No headings, no bullet points, no markdown, no preamble. Do not restate the raw numbers as a list; interpret them.`;
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
@@ -107,18 +105,20 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
     const apiKey = process.env.ANTHROPIC_API_KEY;
-    if (!apiKey) return res.status(500).json({ error: 'Interpretation service is not configured.' });
+    if (!apiKey) {
+        return res.status(503).json({ error: 'Interpretation service is not configured.' });
+    }
 
     const rl = await checkRateLimit(llmLimiter, req);
     res.setHeader('X-RateLimit-Limit', String(rl.limit));
     res.setHeader('X-RateLimit-Remaining', String(rl.remaining));
-    if(!rl.ok) {
-        return res.status(429).json({ error: 'Rate limit exceeded. Please try again later.' });
+    if (!rl.ok) {
+        return res.status(429).json({ error: 'Too many interpretation requests. Try again in a minute.' });
     }
 
     const facts = sanitize(req.body);
     if (!facts) {
-        return res.status(400).json({ error: 'Invalid request body. Please provide valid exoplanet data.' });
+        return res.status(400).json({ error: 'Invalid payload' });
     }
 
     try {
@@ -147,18 +147,17 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
             .join('\n')
             .trim();
 
-        if (!text) return res.status(502).json({ error: 'Interpretation service returned no text.' });
+        if (!text) return res.status(502).json({ error: 'Empty response from model' });
 
-        // Same planet + same score always yields the same reading.
         res.setHeader('Cache-Control', 's-maxage=86400');
-        return res.status(200).json({ interpretation: text});
+        return res.status(200).json({ interpretation: text });
     } catch (err) {
         if (axios.isAxiosError(err)) {
             const status = err.response?.status ?? 502;
-            return res.status(status === 429 ? 429 : 502).json({ 
+            return res.status(status === 429 ? 429 : 502).json({
                 error: status === 429
-                    ? 'The model service is busy. Please try again later.' 
-                    : 'Sorry. Could not generate an interpretation. Please try again later.',
+                    ? 'The model service is busy. Try again shortly.'
+                    : 'Could not generate an interpretation.',
             });
         }
         return res.status(500).json({ error: 'Interpretation failed' });
