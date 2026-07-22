@@ -4,7 +4,6 @@ import type { Star } from '../types';
 import StarField from '../components/StarField';
 import StarHistogram from '../components/StarHistogram';
 import { useStarCatalog, DEFAULT_STAR_QUERY, type StarQueryParams } from '../hooks/useStarCatalog';
-import NASAImagePanel from '../components/NASAImagePanel';
 import StellarPhysicsPanel from '../components/StellarPhysicsPanel';
 
 const ACCENT = '#aabfff';
@@ -142,10 +141,6 @@ export default function StarCatalogPage() {
                     <span style={{ color: 'var(--foreground)', fontFamily: MONO, fontSize: 12, fontWeight: 500 }}>{value}</span>
                   </div>
                 ))}
-                <NASAImagePanel
-                  query={selectedStar.name ?? selectedStar.id}
-                  objectType="star"
-                />
                 <StellarPhysicsPanel
                   colorIndex={selectedStar.colorIndex}
                   magnitude={selectedStar.magnitude}
