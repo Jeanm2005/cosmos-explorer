@@ -1,6 +1,5 @@
 import { X, Sprout, Info } from 'lucide-react';
 import type { Exoplanet } from '../hooks/useExoplanets';
-import NASAImagePanel from './NASAImagePanel';
 import HostLikelihoodPanel from './HostLikelihoodPanel';
 import InterpretationPanel from './InterpretationPanel';
 import { useHostLikelihood } from '../hooks/useHostLikelihood';
@@ -85,11 +84,6 @@ export default function ExoplanetCard({ exoplanet, onClose }: Props) {
             <Row label="Discovery Method" value={exoplanet.discoveryMethod} />
             <Row label="Discovery Year" value={String(exoplanet.discoveryYear)} />
  
-            <NASAImagePanel
-                query={exoplanet.name}
-                objectType="exoplanet"
-                discoveryYear={exoplanet.discoveryYear}
-            />
             {(() => {
                 return hostParams ? (
                     <HostLikelihoodPanel params={hostParams} starName={exoplanet.hostStar} />

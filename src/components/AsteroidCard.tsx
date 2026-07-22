@@ -1,7 +1,6 @@
 import { X, TriangleAlert } from 'lucide-react';
 import type { Asteroid } from '../types';
 import { formatDiameter, formatDistance } from '../utils/normalizers';
-import NASAImagePanel from './NASAImagePanel';
 import { HAZARD_COLOR, SAFE_COLOR } from '../utils/neoStyle';
 
 const MONO = "'JetBrains Mono', ui-monospace, monospace";
@@ -77,11 +76,6 @@ export default function AsteroidCard({ asteroid, onClose }: Props) {
                 </div>
             )}
 
-            <NASAImagePanel
-                query={asteroid.name}
-                fallback="asteroid NASA close up"
-                objectType="asteroid"
-            />
         </div>
     );
 }
